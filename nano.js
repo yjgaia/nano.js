@@ -14,10 +14,11 @@ global.nano = METHOD({
                 let input;
                 app.append(DIV({
                     c: [input = INPUT({
+                        cls: 'nano-input',
                         placeholder: unit,
                         on: {
-                            keyup: (e) => {
-                                let base = REAL(e.getKey()) / ratio;
+                            keyup: () => {
+                                let base = REAL(input.getValue()) / ratio;
 
                                 EACH(inputs, (info) => {
                                     if (info.input !== input) {
@@ -30,6 +31,7 @@ global.nano = METHOD({
                             }
                         }
                     }), SPAN({
+                        cls: 'nano-input-unit',
                         c: unit
                     })]
                 }));
@@ -42,7 +44,7 @@ global.nano = METHOD({
         }
 
         // API를 이용한 단위 변환기
-        if (def.type === 'unit-api') {
+        else if (def.type === 'unit-api') {
 
             let inputs = [];
 
@@ -83,6 +85,7 @@ global.nano = METHOD({
 
                 app.append(DIV({
                     c: [input = INPUT({
+                        cls: 'nano-input',
                         placeholder: unit,
                         on: {
                             keydown: (e) => {
@@ -92,6 +95,7 @@ global.nano = METHOD({
                             }
                         }
                     }), SPAN({
+                        cls: 'nano-input-unit',
                         c: unit
                     })]
                 }));
@@ -100,6 +104,35 @@ global.nano = METHOD({
                     ratio: ratio,
                     input: input
                 });
+            });
+        }
+
+        // 함수
+        else if (def.type === 'func') {
+
+            let inputs = {};
+
+            EACH(def.inputs, (name) => {
+
+                let input;
+                app.append(DIV({
+                    c: [input = INPUT({
+                        cls: 'nano-input',
+                        placeholder: name,
+                        on: {
+                            keyup: () => {
+                                def.func(name, input.getValue(), (name, value) => {
+                                    inputs[name].setValue(value);
+                                });
+                            }
+                        }
+                    }), SPAN({
+                        cls: 'nano-input-unit',
+                        c: name
+                    })]
+                }));
+
+                inputs[name] = input;
             });
         }
 

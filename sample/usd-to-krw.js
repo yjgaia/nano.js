@@ -10,4 +10,4 @@ let result = nano({
 });
 
 document.title = 'Nanoapps - ' + result.name;
-document.querySelector("#root").append(result.desc, result.app.getEl());
+document.querySelector('#root').append(result.desc, result.app.getEl());
