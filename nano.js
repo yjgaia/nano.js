@@ -2,7 +2,9 @@ global.nano = METHOD({
 
     run: (def) => {
 
-        let app = DIV();
+        let app = DIV({
+            cls: 'app'
+        });
 
         // 단위 변환기
         if (def.type === 'unit') {
@@ -13,6 +15,7 @@ global.nano = METHOD({
 
                 let input;
                 app.append(DIV({
+                    cls: 'nano-input-container',
                     c: [input = INPUT({
                         cls: 'nano-input',
                         placeholder: unit,
@@ -84,6 +87,7 @@ global.nano = METHOD({
                 });
 
                 app.append(DIV({
+                    cls: 'nano-input-container',
                     c: [input = INPUT({
                         cls: 'nano-input',
                         placeholder: unit,
@@ -107,6 +111,53 @@ global.nano = METHOD({
             });
         }
 
+        // 계산기
+        else if (def.type === 'calc') {
+
+            if (def.inputs === undefined) {
+                app.append(DIV({
+                    cls: 'result',
+                    c: '= ' + def.calc()
+                }));
+            } else {
+
+                let inputs = {};
+                let calc = () => {
+                    const result = def.calc((name) => {
+                        return parseFloat(inputs[name].getValue());
+                    });
+                    resultPanel.empty();
+                    resultPanel.append('= ' + result);
+                };
+
+                EACH(def.inputs, (name) => {
+
+                    let input;
+                    app.append(DIV({
+                        cls: 'nano-input-container',
+                        c: [input = INPUT({
+                            cls: 'nano-input',
+                            placeholder: name,
+                            on: {
+                                keyup: calc
+                            }
+                        }), SPAN({
+                            cls: 'nano-input-unit',
+                            c: name
+                        })]
+                    }));
+
+                    inputs[name] = input;
+                });
+
+                let resultPanel;
+                app.append(resultPanel = DIV({
+                    cls: 'result',
+                    c: '='
+                }));
+            }
+        }
+
         // 함수
         else if (def.type === 'func') {
 
@@ -116,12 +167,13 @@ global.nano = METHOD({
 
                 let input;
                 app.append(DIV({
+                    cls: 'nano-input-container',
                     c: [input = INPUT({
                         cls: 'nano-input',
                         placeholder: name,
                         on: {
                             keyup: () => {
-                                def.func(name, input.getValue(), (name, value) => {
+                                def.func(name, parseFloat(input.getValue()), (name, value) => {
                                     inputs[name].setValue(value);
                                 });
                             }
